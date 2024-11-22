@@ -1,0 +1,66 @@
+.page1-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f4f8;
+    font-family: 'Arial', sans-serif;
+}
+
+.info-card {
+    background-color: rgba(255, 255, 255, 0.8); /* 투명도 추가 */
+    border-radius: 20px; /* 더 둥글게 */
+    padding: 30px;
+    width: 300px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* 그림자 조금 더 진하게 */
+    text-align: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-10px);
+    background-color: rgba(255, 255, 255, 0.9); /* 호버 시 투명도 조정 */
+}
+
+h1 {
+    font-size: 2.2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #777;
+}
+
+.name {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.course {
+    font-size: 1rem;
+    color: #555;
+    margin: 15px 0;
+}
+
+.connect-button {
+    background-color: rgba(52, 152, 219, 0.8); /* 투명도 추가 */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 15px; /* 더 둥글게 */
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.connect-button:hover {
+    background-color: rgba(41, 128, 185, 0.9); /* 호버 시 색상 변경 */
+    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.4); /* 호버 시 그림자 추가 */
+}
+
+.connect-button:focus {
+    outline: none;
+}
