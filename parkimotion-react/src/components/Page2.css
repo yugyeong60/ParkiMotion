@@ -1,0 +1,126 @@
+/* 전체 컨테이너 스타일 */
+.page2-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* 화면 높이에 맞게 조정 */
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f4f8; /* 부드러운 배경색 */
+}
+
+/* 제목 스타일 */
+h1 {
+  font-size: 2.5rem; /* 제목 크기 확대 */
+  color: #333;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* 검색 섹션 */
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.search-input {
+  width: 300px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: 2px solid #cccccc;
+  border-radius: 30px;
+  outline: none;
+  margin-right: 10px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+.search-button {
+  background-color: rgba(52, 152, 219, 0.8);
+  color: white;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-button:hover {
+  background-color: rgba(41, 128, 185, 0.9);
+  transform: scale(1.1); /* 버튼 크기 확대 */
+}
+
+.search-button:focus {
+  outline: none;
+}
+
+/* 환자 정보 섹션 */
+.patient-info {
+  background-color: #fff; /* 카드 스타일 */
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+  margin-top: 20px;
+  text-align: left;
+  width: 80%; /* 카드 너비 */
+  max-width: 400px;
+  color: #333;
+}
+
+.patient-info h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.patient-info p {
+  font-size: 1rem;
+  margin: 5px 0;
+  line-height: 1.6; /* 텍스트 간격 */
+}
+
+/* 버튼 섹션 */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 30px;
+}
+
+.button-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.button-item:hover {
+  transform: translateY(-5px); /* 살짝 위로 이동 */
+}
+
+.button-icon {
+  font-size: 3rem; /* 아이콘 크기 확대 */
+  margin-bottom: 10px;
+  color: #555; /* 기본 색상 */
+  transition: color 0.3s ease;
+}
+
+.button-item:hover .button-icon {
+  color: #3498db; /* 호버 시 파란색 */
+}
+
+.button-item p {
+  font-size: 1rem;
+  color: #777;
+  margin-top: 5px;
+}
