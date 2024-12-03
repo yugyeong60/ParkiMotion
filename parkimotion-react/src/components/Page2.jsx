@@ -50,13 +50,18 @@ function Page2({ token }) {
   return (
     <div className="page2-container">
       <h1>환자 검색</h1>
-      <input
-        type="text"
-        placeholder="환자 ID를 입력해주세요"
-        value={patientId}
-        onChange={(e) => setPatientId(e.target.value)}
-      />
-      <button onClick={handleSearch}>검색</button>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="환자 ID를 입력해주세요"
+          className="search-input"
+          value={patientId}
+          onChange={(e) => setPatientId(e.target.value)}
+        />
+        <button className="search-button" onClick={handleSearch}>
+          <span role="img" aria-label="search">🔍</span>
+        </button>
+      </div>
 
       {patientData && (
         <div className="patient-info">

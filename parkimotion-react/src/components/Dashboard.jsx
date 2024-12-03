@@ -21,9 +21,21 @@ function Dashboard({ token }) {
   const { patientId } = location.state || {};
 
   const [patientData, setPatientData] = useState(null);
+
   const [walkingData, setWalkingData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(1); // 기본값을 1로 설정 (2번째 데이터부터 표시)
+  
   const [fingerData, setFingerData] = useState([]);
+
+  const [blinkData, setBlinkData] = useState([]); // 눈 깜빡임 데이터 상태 변수
+
+  //발성
+  const vocalExercises = [
+    { name: '지속 발성 (A Sound)', endpoint: '/a-sound' },
+    { name: '지속 발성 (E Sound)', endpoint: '/e-sound' },
+    { name: '반복 발성 (Dadada)', endpoint: '/dadada' },
+    { name: '반복 발성 (Pataka)', endpoint: '/pataka' },
+  ];
 
   useEffect(() => {
     if (!token) {
@@ -67,6 +79,13 @@ function Dashboard({ token }) {
         });
         const fingerData = await fingerResponse.json();
         setFingerData(fingerData.data || []);
+
+        // 눈 깜빡임 데이터 가져오기
+        const blinkResponse = await fetch(`https://kwhcclab.com:20757/api/tests/quick-blink?userId=${patientId}`, {
+          headers: { 'X-Auth-Token': token },
+        });
+        const blinkData = await blinkResponse.json();
+        setBlinkData(blinkData.data || []);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류:', error);
         alert('데이터를 가져오는 중 오류가 발생했습니다.');
@@ -110,8 +129,44 @@ function Dashboard({ token }) {
     ? calculateChange(current, previous, 'speed')
     : { difference: 0, percentage: 0 };
 
+  //발성
+  const handleDownload = async (endpoint, exerciseName) => {
+    if (!token || !patientId) {
+      alert('인증이 필요합니다.');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`https://kwhcclab.com:20757/api/tests${endpoint}?userId=${patientId}`, {
+        headers: { 'X-Auth-Token': token },
+      });
+
+      if (!response.ok) {
+        throw new Error('데이터를 가져오는 데 실패했습니다.');
+      }
+
+      const data = await response.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+  
+      // 다운로드 링크 생성
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${exerciseName}_data_${patientId}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  
+      alert(`${exerciseName} 데이터를 다운로드했습니다.`);
+    } catch (error) {
+      console.error(`${exerciseName} 다운로드 오류:`, error);
+      alert(`${exerciseName} 데이터를 다운로드하는 중 오류가 발생했습니다.`);
+    }
+  };
+
   return (
     <div className="dashboard-container">
+      {/* 사이드 바 */}
       <div className="sidebar">
         <h2>환자 정보</h2>
         {patientData ? (
@@ -125,14 +180,29 @@ function Dashboard({ token }) {
         ) : (
           <p>환자 정보를 불러오는 중...</p>
         )}
+
+        {/* 발성 운동 데이터 다운로드 */}
+        <div className="vocal-exercises">
+        <h2>발성 운동 데이터 다운로드</h2>
+        {vocalExercises.map((exercise) => (
+          <button key={exercise.endpoint} onClick={() => handleDownload(exercise.endpoint, exercise.name)}>
+            {exercise.name}
+          </button>
+        ))}
+        </div>
+
       </div>
+      
+      
+
+      {/*1번째 손 터치 슬라이드 */}
       <div className="main-panel">
-        <h1>걷기 데이터 변화</h1>
+        <h1>걷기 운동</h1>
         {current && (
           <div className="walking-group">
             <h2>데이터 ID: {current.id}</h2>
             <p>걸음걸이 수 변화: {stepChange.difference} ({stepChange.percentage}%)</p>
-            <p>속도 변화: {speedChange.difference.toFixed(2)} m/s ({speedChange.percentage}%)</p>
+            <p>속도 변화: {speedChange.difference.toFixed(2)} m/m ({speedChange.percentage}%)</p>
 
             <div className="thermometer">
               {/* 걸음 변화 바 */}
@@ -155,24 +225,28 @@ function Dashboard({ token }) {
             <div className="walking-data">
               <p><strong>이전 데이터:</strong> {previous ? previous.step : '없음'}걸음</p>
               <p><strong>현재 데이터:</strong> {current.step}걸음</p>
-              <p><strong>현재 속도:</strong> {current.speed.toFixed(2)} m/s</p>
+              <p><strong>현재 속도:</strong> {current.speed.toFixed(2)} m/m</p>
             </div>
+            <div className="navigation-buttons">
+              <button onClick={handleFirst} disabled={currentIndex <= 1}>처음</button>
+              <button onClick={handlePrevious} disabled={currentIndex <= 1}>이전</button>
+              <button onClick={handleNext} disabled={currentIndex === walkingData.length - 1}>다음</button>
+              <button onClick={handleLast} disabled={currentIndex === walkingData.length - 1}>마지막</button>
+        </div>
+
           </div>
         )}
 
-        <div className="navigation-buttons">
-          <button onClick={handleFirst} disabled={currentIndex <= 1}>처음으로 가기</button>
-          <button onClick={handlePrevious} disabled={currentIndex <= 1}>이전으로 돌아가기</button>
-          <button onClick={handleNext} disabled={currentIndex === walkingData.length - 1}>다음으로 넘어가기</button>
-          <button onClick={handleLast} disabled={currentIndex === walkingData.length - 1}>마지막으로 가기</button>
-        </div>
-
         {/* 걷기 데이터 그래프 */}
         <div className="chart-container">
-          <h2>전체 걷기 데이터 그래프</h2>
+          <h2>걷기 데이터 그래프</h2>
           <Line
             data={{
-              labels: walkingData.map((item) => item.createdAt),
+              labels: walkingData.map((item) => {
+              // x축 표시를 "월-일" 형태로 변환
+                const date = new Date(item.createdAt);
+                return `${date.getMonth() + 1}-${date.getDate()}`;
+              }),
               datasets: [
                 {
                   label: '걸음수',
@@ -182,7 +256,7 @@ function Dashboard({ token }) {
                   yAxisID: 'y',
                 },
                 {
-                  label: '속도 (m/s)',
+                  label: '속도 (m/m)',
                   data: walkingData.map((item) => item.speed),
                   borderColor: 'red',
                   backgroundColor: 'rgba(255, 0, 0, 0.1)',
@@ -196,12 +270,42 @@ function Dashboard({ token }) {
                 legend: {
                   position: 'top',
                 },
-                title: {
-                  display: true,
-                  text: '걸음수 및 속도 데이터 변화',
+                // title: {
+                //   display: true,
+                //   text: '걸음수 및 속도 데이터 변화',
+                // },
+                tooltip: {
+                  callbacks: {
+                    title: function (context) {
+                      const index = context[0].dataIndex;
+                      const item = walkingData[index];
+                      const fullDate = new Date(item.createdAt);
+        
+                      // 툴팁에 전체 날짜 표시
+                      return `${fullDate.getFullYear()}-${fullDate.getMonth() + 1}-${fullDate.getDate()} ${fullDate.getHours()}:${fullDate.getMinutes()}`;
+                    },
+                    label: function (context) {
+                      const index = context.dataIndex;
+                      const item = walkingData[index];
+                      const medicationTime = item.timeAfterTakingMedicine || '정보 없음';
+        
+                      // 기본 데이터 툴팁 정보 표시
+                      const value = context.raw;
+                      const label = context.dataset.label;
+        
+                      // 약 복용 후 시간 추가
+                      return `${label}: ${value} (약 복용 후: ${medicationTime}분 경과)`;
+                    },
+                  },
                 },
               },
               scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: '날짜 (월-일)',
+                  },
+                },
                 y: {
                   type: 'linear',
                   display: true,
@@ -217,7 +321,7 @@ function Dashboard({ token }) {
                   position: 'right',
                   title: {
                     display: true,
-                    text: '속도 (m/s)',
+                    text: '속도 (m/m)',
                   },
                   grid: {
                     drawOnChartArea: false,
@@ -227,13 +331,18 @@ function Dashboard({ token }) {
             }}
           />
         </div>
-    </div>
-    <div className='dashboard2'>
+      </div>
+      {/* 2번째 손 터치 슬라이드 */}
+      <div className='dashboard2'>
+      <h1>손가락 운동</h1>
         <div className="finger-chart">
-          <h1>손 터치 횟수</h1>
+          <h2>양손별 터치변화 추이</h2>
             <Line
               data={{
-                labels: fingerData.filter((item) => item.hand === 'L').map((item) => item.createdAt),
+                labels: fingerData.filter((item) => item.hand === 'L').map((item) => {
+                  const date = new Date(item.createdAt);
+                  return `${date.getMonth() + 1}-${date.getDate()}`; // x축 표시를 "월-일"로 변환
+                }),
                 datasets: [
                   {
                     label: '왼손',
@@ -251,19 +360,43 @@ function Dashboard({ token }) {
                   legend: {
                     position: 'top',
                   },
-                  title: {
-                    display: true,
-                    text: '왼손 터치 데이터',
+                  // title: {
+                  //   display: true,
+                  //   text: '왼손 터치 데이터',
+                  // },
+                  tooltip: {
+                    callbacks: {
+                      title: function (context) {
+                        const index = context[0].dataIndex;
+                        const item = fingerData.filter((item) => item.hand === 'L')[index];
+                        const fullDate = new Date(item.createdAt);
+                        return `${fullDate.getFullYear()}-${fullDate.getMonth() + 1}-${fullDate.getDate()} ${fullDate.getHours()}:${fullDate.getMinutes()}`;
+                      },
+                      label: function (context) {
+                        const index = context.dataIndex;
+                        const item = fingerData.filter((item) => item.hand === 'L')[index];
+                        const medicationTime = item.timeAfterTakingMedicine || '정보 없음';
+        
+                        // 기본 데이터와 약 복용 후 시간 표시
+                        return `횟수: ${item.count} (약 복용 후: ${medicationTime}분 경과)`;
+                      },
+                    },
                   },
                 },
                 scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: '날짜 (월-일)',
+                    },
+                  },
                   y: {
                     type: 'linear',
                     display: true,
                     position: 'left',
                     title: {
                       display: true,
-                      text: '왼손 터치 횟수',
+                      text: '터치 횟수',
                     },
                   },
                 },
@@ -271,7 +404,10 @@ function Dashboard({ token }) {
             />
             <Line
               data={{
-                labels: fingerData.filter((item) => item.hand === 'R').map((item) => item.createdAt),
+                labels: fingerData.filter((item) => item.hand === 'R').map((item) => {
+                  const date = new Date(item.createdAt);
+                  return `${date.getMonth() + 1}-${date.getDate()}`; // x축 표시를 "월-일"로 변환
+                }),
                 datasets: [
                   {
                     label: '오른손',
@@ -289,19 +425,43 @@ function Dashboard({ token }) {
                   legend: {
                     position: 'top',
                   },
-                  title: {
-                    display: true,
-                    text: '오른손 터치 데이터',
+                  // title: {
+                  //   display: true,
+                  //   text: '오른손 터치 데이터',
+                  // },
+                  tooltip: {
+                    callbacks: {
+                      title: function (context) {
+                        const index = context[0].dataIndex;
+                        const item = fingerData.filter((item) => item.hand === 'R')[index];
+                        const fullDate = new Date(item.createdAt);
+                        return `${fullDate.getFullYear()}-${fullDate.getMonth() + 1}-${fullDate.getDate()} ${fullDate.getHours()}:${fullDate.getMinutes()}`;
+                      },
+                      label: function (context) {
+                        const index = context.dataIndex;
+                        const item = fingerData.filter((item) => item.hand === 'R')[index];
+                        const medicationTime = item.timeAfterTakingMedicine || '정보 없음';
+        
+                        // 기본 데이터와 약 복용 후 시간 표시
+                        return `횟수: ${item.count} (약 복용 후: ${medicationTime}분 경과)`;
+                      },
+                    },
                   },
                 },
                 scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: '날짜 (월-일)',
+                    },
+                  },
                   y: {
                     type: 'linear',
                     display: true,
                     position: 'left',
                     title: {
                       display: true,
-                      text: '오른손터치 횟수',
+                      text: '터치 횟수',
                     },
                   },
                 },
@@ -309,6 +469,79 @@ function Dashboard({ token }) {
             />
         </div>
       </div>
+      {/* 3번째 눈깜빡임 슬라이드 */}
+      {/* 눈 깜빡임 데이터 그래프 */}
+      <div className="dashboard3">
+        <h1>눈 깜빡임</h1>
+        <div className='blink-chart'>
+        <h2>눈 깜빡임 데이터</h2>
+        <Line
+          data={{
+            labels: blinkData.map((item) => {
+              const date = new Date(item.createdAt);
+              return `${date.getMonth() + 1}-${date.getDate()}`; // x축 표시를 "월-일"로 변환
+            }),
+            datasets: [
+              {
+                label: '눈 깜빡임 횟수',
+                data: blinkData.map((item) => item.count),
+                borderColor: 'purple',
+                backgroundColor: 'rgba(128, 0, 128, 0.1)',
+              },
+            ],
+          }}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              // title: {
+              //   display: true,
+              //   text: '눈 깜빡임 데이터',
+              // },
+              tooltip: {
+                callbacks: {
+                  title: function (context) {
+                    const index = context[0].dataIndex;
+                    const item = blinkData[index];
+                    const fullDate = new Date(item.createdAt);
+                    return `${fullDate.getFullYear()}-${fullDate.getMonth() + 1}-${fullDate.getDate()} ${fullDate.getHours()}:${fullDate.getMinutes()}`;
+                  },
+                  label: function (context) {
+                    const index = context.dataIndex;
+                    const item = blinkData[index];
+                    const medicationTime = item.timeAfterTakingMedicine || '정보 없음';
+
+                    // 기본 데이터와 약 복용 후 시간 표시
+                    return `횟수: ${item.count} (약 복용 후: ${medicationTime}분 경과)`;
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: '날짜 (월-일)',
+                },
+              },
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                // title: {
+                //   display: true,
+                //   text: '눈 깜빡임 횟수',
+                // },
+              },
+            },
+          }}
+        />
+        </div>
+      </div>
+
+
     </div>
   );
 }
