@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-function Walking({ token }) {
+function Walking({ token, setData }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { patientId } = location.state || {};
-  const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!token) {
+        alert('인증이 필요합니다.');
+        navigate('/');
+        return;
+      }
+
       try {
         const response = await fetch(`https://kwhcclab.com:20757/api/tests/gait?userId=${patientId}`, {
-          headers: { "X-Auth-Token": token },
+          headers: { 'X-Auth-Token': token },
         });
         const result = await response.json();
         setData(result.data || []);
@@ -20,22 +26,12 @@ function Walking({ token }) {
     };
 
     if (patientId) fetchData();
-  }, [patientId, token]);
+  }, [patientId, token, navigate, setData]);
 
   return (
-    <div className="page-container">
+    <div>
       <h1>Walking Exercise</h1>
-      {data.length > 0 ? (
-        <ul>
-          {data.map((item) => (
-            <li key={item.id}>
-              검사 ID: {item.id}, 거리: {item.distance}m, 시간: {item.time}분, 보폭: {item.stride}, 발걸음 수: {item.step}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>운동 데이터를 불러오는 중...</p>
-      )}
+      <button onClick={() => navigate('/result')}>결과 보기</button>
     </div>
   );
 }

@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-function Hands({ token }) {
+function Hands({ token, setData }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { patientId } = location.state || {};
-  const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!token) {
+        alert('인증이 필요합니다.');
+        navigate('/');
+        return;
+      }
+
       try {
         const response = await fetch(`https://kwhcclab.com:20757/api/tests/finger?userId=${patientId}`, {
-          headers: { "X-Auth-Token": token },
+          headers: { 'X-Auth-Token': token },
         });
         const result = await response.json();
         setData(result.data || []);
@@ -20,22 +26,12 @@ function Hands({ token }) {
     };
 
     if (patientId) fetchData();
-  }, [patientId, token]);
+  }, [patientId, token, navigate, setData]);
 
   return (
-    <div className="page-container">
+    <div>
       <h1>Hands Exercise</h1>
-      {data.length > 0 ? (
-        <ul>
-          {data.map((item) => (
-            <li key={item.id}>
-              검사 ID: {item.id}, 터치 횟수: {item.count}, 손: {item.hand}, 검사 시간: {item.createdAt}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>운동 데이터를 불러오는 중...</p>
-      )}
+      <button onClick={() => navigate('/result')}>결과 보기</button>
     </div>
   );
 }

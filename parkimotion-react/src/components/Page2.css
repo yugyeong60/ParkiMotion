@@ -124,3 +124,19 @@ h1 {
   color: #777;
   margin-top: 5px;
 }
+
+.result-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.result-button:hover {
+  background-color: #45a049;
+}
