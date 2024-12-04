@@ -167,4 +167,5 @@ function Page2({ token }) {
   );
 }
 
+
 export default Page2;
