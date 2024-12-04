@@ -29,7 +29,7 @@ function Walking({ token }) {
         <ul>
           {data.map((item) => (
             <li key={item.id}>
-              검사 ID: {item.id}, 거리: {item.distance}m, 시간: {item.time}분, 보폭: {item.stride}, 발걸음 수: {item.step}
+              검사 ID: {item.id}, 거리: {item.distance}m, 걸은 시간: {item.time}분, 보폭: {item.stride}, 발걸음 수: {item.step}, 약 먹은 뒤 지난 시간(분): {item.timeAfterTakingMedicine}
             </li>
           ))}
         </ul>
