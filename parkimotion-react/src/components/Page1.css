@@ -26,7 +26,7 @@ html, body {
 
 /* 카드 스타일 */
 .info-card {
-  background-color: rgba(0, 0, 0, 0.2); /* 투명한 흰색 */
+  background-color: #89a8b245; /* 투명한 흰색 */
   backdrop-filter: blur(15px); /* 배경 흐림 효과 */
   -webkit-backdrop-filter: blur(8px); /* 크로스 브라우징을 위한 설정 */
   border-radius: 30px; /* 둥근 모서리 */
@@ -46,7 +46,7 @@ html, body {
 /* 제목 스타일 */
 #teamname {
   font-size: 2.4rem; /* 제목 크기 */
-  color: #ffffff; /* 진한 회색 */
+  color: #000000; /* 진한 회색 */
   margin-bottom: 20px;
   word-break: keep-all; /* 단어가 끊기지 않도록 설정 */
 }
@@ -54,7 +54,7 @@ html, body {
 /* 부제목 스타일 */
 .subtitle {
   font-size: 1.2rem; /* 부제목 크기 */
-  color: #cbcbcb;
+  color: #383838;
   margin-bottom: 15px;
   word-break: keep-all; /* 단어가 끊기지 않도록 설정 */
 }
@@ -62,7 +62,7 @@ html, body {
 /* 이름 및 정보 */
 .course {
   font-size: 1rem; /* 정보 텍스트 크기 */
-  color: #878787; /* 약간 어두운 회색 */
+  color: #4d4d4d; /* 약간 어두운 회색 */
   margin: 15px 0;
   line-height: 1.6; /* 줄 간격 조정 */
   text-align: center; /* 텍스트를 중앙 정렬 */

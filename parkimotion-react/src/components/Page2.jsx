@@ -49,7 +49,7 @@ function Page2({ token }) {
 
   return (
     <div className="page2-container">
- <h1>환자 검색</h1>
+ <h1 className="search-name">환자 검색</h1>
   <div className="search-container">
     <div className="search-wrapper">
       <input
