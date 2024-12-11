@@ -189,6 +189,47 @@ function Dashboard({ token }) {
     }
   };
 
+  // 화면 응시 데이터 다운로드 함수
+  const handleScreenGazeDownload = async () => {
+    if (!token || !patientId) {
+      alert('인증이 필요합니다.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://kwhcclab.com:20757/api/tests/screen-gaze?userId=${patientId}`, {
+        headers: { 'X-Auth-Token': token },
+      });
+
+      if (!response.ok) {
+        throw new Error('데이터를 가져오는 데 실패했습니다.');
+      }
+
+      const data = await response.json();
+      
+      // CSV 데이터 생성
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "ID,Count,Time After Taking Medicine,Created At,User ID\n";
+      
+      data.data.forEach(item => {
+        csvContent += `${item.id},${item.count},${item.timeAfterTakingMedicine},${item.createdAt},${item.userId}\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `screen_gaze_data_${patientId}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      alert('화면 응시 데이터를 다운로드했습니다.');
+    } catch (error) {
+      console.error('화면 응시 데이터 다운로드 오류:', error);
+      alert('화면 응시 데이터를 다운로드하는 중 오류가 발생했습니다.');
+    }
+  };
+
   // 왼손 및 오른손 평균 계산
   const leftHandAverage =
     fingerData
@@ -455,6 +496,8 @@ function Dashboard({ token }) {
                       );
   };
 
+  
+
   return (
     <div className="dashboard-container">
       {/* 사이드 바 */}
@@ -514,6 +557,8 @@ function Dashboard({ token }) {
             {exercise.name}
           </button>
         ))}
+        <h3>화면 응시 데이터</h3>
+          <button onClick={handleScreenGazeDownload}>화면 응시 (CSV)</button>
         </div>
 
       </div>
@@ -604,6 +649,9 @@ function Dashboard({ token }) {
                 legend: {
                   position: 'top',
                 },
+                datalabels: {
+                  display: false, // This will hide all datalabels
+                },
                 // title: {
                 //   display: true,
                 //   text: '걸음수 및 속도 데이터 변화',
@@ -639,6 +687,7 @@ function Dashboard({ token }) {
                     display: true,
                     text: '날짜 (월-일)',
                   },
+                  reverse: true,
                 },
                 y: {
                   type: 'linear',
@@ -692,6 +741,9 @@ function Dashboard({ token }) {
               plugins: {
                   legend: {
                     position: 'top',
+                  },
+                  datalabels: {
+                    display: false, // This will hide all datalabels
                   },
                 tooltip: {
                   callbacks: {
@@ -842,6 +894,9 @@ function Dashboard({ token }) {
                   legend: {
                     position: 'top',
                   },
+                  datalabels: {
+                    display: false, // This will hide all datalabels
+                  },
                   // title: {
                   //   display: true,
                   //   text: '왼손 터치 데이터',
@@ -871,6 +926,7 @@ function Dashboard({ token }) {
                       display: true,
                       text: '날짜 (월-일)',
                     },
+                    reverse: true,
                   },
                   y: {
                     type: 'linear',
@@ -911,6 +967,9 @@ function Dashboard({ token }) {
                   legend: {
                     position: 'top',
                   },
+                  datalabels: {
+                    display: false, // This will hide all datalabels
+                  },
                   // title: {
                   //   display: true,
                   //   text: '오른손 터치 데이터',
@@ -940,6 +999,7 @@ function Dashboard({ token }) {
                       display: true,
                       text: '날짜 (월-일)',
                     },
+                    reverse: true,
                   },
                   y: {
                     type: 'linear',
@@ -1010,6 +1070,9 @@ function Dashboard({ token }) {
                   labels: {
                     filter: (legendItem, data) => legendItem.text !== undefined
                   }
+                },
+                datalabels: {
+                  display: false, // This will hide all datalabels
                 },
               },
               scales: {
@@ -1136,6 +1199,9 @@ function Dashboard({ token }) {
               legend: {
                 position: 'top',
               },
+              datalabels: {
+                display: false, // This will hide all datalabels
+              },
               // title: {
               //   display: true,
               //   text: '눈 깜빡임 데이터',
@@ -1165,6 +1231,7 @@ function Dashboard({ token }) {
                   display: true,
                   text: '날짜 (월-일)',
                 },
+                reverse: true,
               },
               y: {
                 type: 'linear',
