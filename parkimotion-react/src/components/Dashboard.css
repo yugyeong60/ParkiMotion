@@ -16,7 +16,7 @@ h2 {
 }
 
 .dashboard-container {
-  margin-top: 670px;
+  margin-top: 590px;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row; /* 항목을 수평으로 정렬 */
@@ -96,7 +96,7 @@ h2 {
 }
 
 .profile-image {
-  margin-left: 42px;
+  margin-left: 90px;
   width: 130px;
 }
 
@@ -112,6 +112,7 @@ h2 {
   border-radius: 12px;
   outline: none;
   margin-top: 10px;
+  margin-left: 5px;
   margin-right: 5px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
