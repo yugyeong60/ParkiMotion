@@ -6,8 +6,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import './Page2.css';
 import image2 from '../image/image2.jpg'
 
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels, ChartErrorBars);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
 
 function Page2({ token }) {
   const [patientId, setPatientId] = useState('');
@@ -16,46 +15,6 @@ function Page2({ token }) {
   const [genderData, setGenderData] = useState(null);
   const [ageData, setAgeData] = useState(null);
   const navigate = useNavigate();
-
-  const handleSearch = async () => {
-    if (!token) {
-      alert('인증이 필요합니다. 다시 로그인해주세요.');
-      navigate('/');
-      return;
-    }
-
-    if (!patientId.trim()) {
-      alert('환자 ID를 입력해주세요.');
-      return;
-    }
-
-    try {
-      const response = await fetch(`https://kwhcclab.com:20757/api/users/${patientId}`, {
-        headers: { 'X-Auth-Token': token },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPatientData(data);
-      } else if (response.status === 401) {
-        alert('인증에 실패했습니다. 다시 로그인해주세요.');
-        navigate('/');
-      } else {
-        alert('환자 정보를 찾을 수 없습니다.');
-      }
-    } catch (error) {
-      console.error('Error fetching patient data:', error);
-      alert('데이터를 불러오는 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleDashboardClick = () => {
-    if (patientData) {
-      navigate('/dashboard', { state: { patientId, patientData } });
-    } else {
-      alert('먼저 환자 정보를 검색해주세요.');
-    }
-  };
 
   useEffect(() => {
     fetchAllPatientsData();
@@ -161,7 +120,46 @@ function Page2({ token }) {
       ],
     });
   };
-  
+
+  const handleSearch = async () => {
+    if (!token) {
+      alert('인증이 필요합니다. 다시 로그인해주세요.');
+      navigate('/');
+      return;
+    }
+
+    if (!patientId.trim()) {
+      alert('환자 ID를 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://kwhcclab.com:20757/api/users/${patientId}`, {
+        headers: { 'X-Auth-Token': token },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPatientData(data);
+      } else if (response.status === 401) {
+        alert('인증에 실패했습니다. 다시 로그인해주세요.');
+        navigate('/');
+      } else {
+        alert('환자 정보를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('Error fetching patient data:', error);
+      alert('데이터를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleDashboardClick = () => {
+    if (patientData) {
+      navigate('/dashboard', { state: { patientId, patientData } });
+    } else {
+      alert('먼저 환자 정보를 검색해주세요.');
+    }
+  };
 
   return (
     <div className="page2-container">
@@ -214,6 +212,11 @@ function Page2({ token }) {
                       display: true,
                       text: '성별 분포',
                     },
+                    datalabels: {
+                      anchor: 'end',
+                      align: 'top',
+                      formatter: (value) => value,
+                    },
                   },
                 }}
               />
@@ -237,7 +240,7 @@ function Page2({ token }) {
                     datalabels: {
                       anchor: 'end',
                       align: 'top',
-                      formatter: (value) => Math.round(value * 10) / 10,
+                      formatter: (value) => value,
                     },
                   },
                   scales: {
@@ -245,7 +248,7 @@ function Page2({ token }) {
                       beginAtZero: true,
                       title: {
                         display: true,
-                        text: '나이',
+                        text: '환자 수',
                       },
                     },
                   },
