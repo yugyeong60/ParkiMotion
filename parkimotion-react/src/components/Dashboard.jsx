@@ -449,7 +449,8 @@ function Dashboard({ token }) {
                        '7월', '8월', '9월', '10월', '11월', '12월'];
 
                        return (
-                        <div className="blink-chart">
+                        // <div className="blink-chart">
+                          <div className="chart-container">
                           <div className="heatmap-header">
                             <h2>눈 깜빡임 월별 히트맵</h2>
                             <div className="heatmap-legend">
@@ -502,21 +503,22 @@ function Dashboard({ token }) {
     <div className="dashboard-container">
       {/* 사이드 바 */}
       <div className="sidebar">
-        <h1 id="name">환자 정보검색</h1>
-        <div className="search-container">
+        <h2 id="name">환자 정보검색</h2>
+        <div className="search-container1">
           <input
             type="text"
             placeholder="환자 ID를 입력해주세요"
-            className="search-input"
+            className="search-input1"
             value={patientId}
             onChange={(e) => setPatientId(e.target.value)}
           />
-          <button className="search-button" onClick={handleDashboardClick}>
+          {/* <button className="search-button" onClick={handleDashboardClick}>
             <span role="img" aria-label="search">🔍</span>
-          </button>
+          </button> */}
         </div>
         {patientData ? (
           <div id="info">
+            <h2>환자 정보</h2>
             <div className="profile-image-container">
               <img 
                 src={patientData.gender === 'M' ? maleProfile : femaleProfile}
@@ -524,7 +526,6 @@ function Dashboard({ token }) {
                 className="profile-image"
               />
             </div>
-            <h2>환자 정보</h2>
             <p><strong>ID:</strong> {patientData.id}</p>
             <p><strong>이름:</strong> {patientData.name}</p>
             <p><strong>성별:</strong> {patientData.gender === 'M' ? '남성' : '여성'}</p>
@@ -538,6 +539,7 @@ function Dashboard({ token }) {
         {/* 데이터 개수 설정 입력 필드 추가 */}
         <div className="data-limit-container">
           <h2>데이터 설정</h2>
+          <div id="info">
           <label htmlFor="dataLimit">데이터 크기:</label>
           <input
             type="number"
@@ -548,17 +550,21 @@ function Dashboard({ token }) {
           />
           <button onClick={handleApplyDataLimit} className="apply-button">적용</button>
         </div>
-        
+        </div>
         {/* 발성 운동 데이터 다운로드 */}
         <div className="vocal-exercises">
-        <h2>발성 운동 데이터 다운로드</h2>
+        <h2>발성 운동 데이터 다운</h2>
+        <div id="down">
         {vocalExercises.map((exercise) => (
-          <button key={exercise.endpoint} onClick={() => handleDownload(exercise.endpoint, exercise.name)}>
+          <button id='btn-down' key={exercise.endpoint} onClick={() => handleDownload(exercise.endpoint, exercise.name)}>
             {exercise.name}
           </button>
         ))}
-        <h3>화면 응시 데이터</h3>
-          <button onClick={handleScreenGazeDownload}>화면 응시 (CSV)</button>
+        </div>
+        <h2>화면 응시 데이터</h2>
+        <div id="info">
+          <button id='btn-down-see' onClick={handleScreenGazeDownload}>화면 응시 (CSV)</button>
+        </div>
         </div>
 
       </div>
@@ -714,7 +720,7 @@ function Dashboard({ token }) {
             }}
           />
         </div>
-        <div className='chart2-walking'>
+        <div className="chart-container">
           <h2>약 복용 후 시간에 따른 속도 변화</h2>
           <Line
             data={{
@@ -786,10 +792,30 @@ function Dashboard({ token }) {
       {/* 2번째 손 터치 슬라이드 */}
       <div className='dashboard2'>
       <h2 id="name">손가락 운동</h2>
+      
       {currentFinger && (
+        <div className="walking-group">
             <div className="finger-exercise-group">
               <div className="finger-thermometer">
-                <h3>{selectedHand === 'L' ? '왼손' : '오른손'}</h3>
+                <span 
+                  style={{
+                    color: change.percentage >= 0 ? 'green' : 'red', 
+                    fontWeight: 'bold', 
+                    fontSize: '2em'
+                  }}
+                >
+                  {change.percentage === 0 ? '=' : (change.percentage > 0 ? '▲' : '▼')}
+                  {Math.abs(change.percentage)}%
+                </span>                
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <h3 id="hands">{selectedHand === 'L' ? '왼손' : '오른손'}</h3>
+                <button 
+                  onClick={toggleSelectedHand}
+                  className="hand-toggle-button"
+                >
+                  {selectedHand === 'L' ? '오른손으로 전환' : '왼손으로 전환'}
+                </button>
+              </div>
                 <div className="thermometer">
                   <div
                     className={`thermometer-bar ${change.difference >= 0 ? 'green' : 'red'}`}
@@ -798,24 +824,10 @@ function Dashboard({ token }) {
                     }}
                   ></div>
                 </div>
-                <span 
-                  style={{
-                    color: change.percentage >= 0 ? 'green' : 'red', 
-                    fontWeight: 'bold', 
-                    fontSize: '1.5em'
-                  }}
-                >
-                  {change.percentage === 0 ? '=' : (change.percentage > 0 ? '▲' : '▼')}
-                  {Math.abs(change.percentage)}%
-                </span>
-                <button 
-                  onClick={toggleSelectedHand}
-                  className="hand-toggle-button"
-                >
-                  {selectedHand === 'L' ? '오른손으로 전환' : '왼손으로 전환'}
-                </button>
-              </div>
 
+
+              </div>
+            </div>
               <div className="finger-data">
                 <p>
                   <strong>평균 터치 횟수:</strong> {averageTouchCount.toFixed(1)}회
@@ -867,7 +879,7 @@ function Dashboard({ token }) {
               </div>
             </div>
           )}
-        <div className="finger-chart">
+        <div className="chart-container">
           <h2>양손별 터치변화 추이</h2>
             <Line
               data={{
@@ -942,6 +954,7 @@ function Dashboard({ token }) {
                 },
               }}
             />
+            
             <Line
               data={{
                 labels: fingerData.filter((item) => item.hand === 'R').map((item) => {
@@ -1016,7 +1029,9 @@ function Dashboard({ token }) {
               }}
             />
         </div>
+        <div className="chart-container">
         <div className='chart2-finger'>
+        <h2>양손별 터치변화 추이(이름수정)</h2>
           <Scatter 
             data={{
               datasets: [
@@ -1092,18 +1107,29 @@ function Dashboard({ token }) {
               
             }}
           />
-
+        </div>
         </div>
       </div>
       {/* 3번째 눈깜빡임 슬라이드 */}
       {/* 눈 깜빡임 데이터 그래프 */}
       <div className="dashboard3">
         <h2 id='name'>눈 깜빡임</h2>
+        <div className="walking-group">
         {getCurrentBlinkData() && (
             <div className="blink-exercise-group">
               <div className="blink-thermometer">
-                <h3>눈 깜빡임 횟수</h3>
-                <div className="thermometer">
+              <span 
+                  style={{
+                    color: blinkChange.percentage >= 0 ? 'green' : 'red', 
+                    fontWeight: 'bold', 
+                    fontSize: '2rem'
+                  }}
+                >
+                  {blinkChange.percentage === 0 ? '=' : (blinkChange.percentage > 0 ? '▲' : '▼')}
+                  {Math.abs(blinkChange.percentage)}%
+                </span>
+                <div className="thermometer">                
+
                   <div
                     className={`thermometer-bar ${blinkChange.difference >= 0 ? 'green' : 'red'}`}
                     style={{
@@ -1111,16 +1137,7 @@ function Dashboard({ token }) {
                     }}
                   ></div>
                 </div>
-                <span 
-                  style={{
-                    color: blinkChange.percentage >= 0 ? 'green' : 'red', 
-                    fontWeight: 'bold', 
-                    fontSize: '1.5em'
-                  }}
-                >
-                  {blinkChange.percentage === 0 ? '=' : (blinkChange.percentage > 0 ? '▲' : '▼')}
-                  {Math.abs(blinkChange.percentage)}%
-                </span>
+
               </div>
 
               <div className="blink-data">
@@ -1174,7 +1191,8 @@ function Dashboard({ token }) {
               </div>
             </div>
           )}
-        <div className='blink-chart'>
+          </div>
+        <div className="chart-container">
         <h2>눈 깜빡임 데이터</h2>
         <Line
           data={{
